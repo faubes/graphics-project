@@ -131,20 +131,6 @@ namespace CSI4130 {
 			generateBuffer( d_tbo, sizeof(glm::vec2)*static_cast<int>(texCoord.size()), &texCoord[0] );
 		}
 
-    // load cube map texture
-    d_cubeMapTexture = Texture::bindCubeMapTexture("../hw_morning", "morning", false);
-    errorOut();
-    // send skybox vertices to openGL
-    glGenBuffers(1, &d_skybox_vbo);
-    glBindBuffer(GL_ARRAY_BUFFER, d_skybox_vbo);
-    glBufferData(GL_ARRAY_BUFFER, 3 * 36 * sizeof(float), &skyboxVertices, GL_STATIC_DRAW);
-
-    glGenVertexArrays(1, &d_skybox_vao);
-    glBindVertexArray(d_skybox_vao);
-    glEnableVertexAttribArray(0);
-    glBindBuffer(GL_ARRAY_BUFFER, d_skybox_vbo);
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, NULL);
-
 		d_mArray = oMesh.getMaterial();
     // Generate an uniform buffer object
     glGenBuffers(1, &d_ubo);
@@ -164,7 +150,6 @@ namespace CSI4130 {
 		if ( oMesh.hasTexture() ) {
 			d_progTexture = loadShader( "texture" );
 		}
-    d_progSkybox = loadShader( "skybox" );
 
     // finally make element drawing active
     setProgElement();
@@ -196,7 +181,7 @@ namespace CSI4130 {
   bool Viewer::setProgElement() {
 		if ( !switchProgram( d_progElement )) return true;
     // switch to corresponding vao
-    cerr << "Use vao: " << d_vao_ele << endl;
+    //cerr << "Use vao: " << d_vao_ele << endl;
     glBindVertexArray( d_vao_ele );
 #ifdef DEBUG_VIEWER_VERBOSE
     cerr << "Binding ebo: " << d_ebo << endl;
@@ -223,7 +208,7 @@ namespace CSI4130 {
 
 	void Viewer::setArrayVAO() {
     // switch to corresponding vao
-    cerr << "Use vao: " << d_vao << endl;
+    //cerr << "Use vao: " << d_vao << endl;
     glBindVertexArray( d_vao );
 #ifdef DEBUG_VIEWER_VERBOSE
     cerr << "Binding nbo: " << d_nbo << endl;
@@ -346,10 +331,10 @@ namespace CSI4130 {
   void Viewer::generateBuffer( GLuint& _bo, int _sz, const void* _ptr ) {
     glGenBuffers(1, &_bo);
     glBindBuffer(GL_ARRAY_BUFFER, _bo );
-#ifdef DEBUG_VIEWER_VERBOSE
+//#ifdef DEBUG_VIEWER_VERBOSE
     cerr << "Setting buffer data: " << _bo << " " << _sz << " " << std::hex <<
       _ptr << std::dec << endl;
-#endif
+//#endif
     glBufferData(GL_ARRAY_BUFFER,
 		 _sz,
 		 _ptr, GL_STATIC_DRAW );

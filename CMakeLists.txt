@@ -21,7 +21,7 @@ message("Project source dir: ${PROJECT_SOURCE_DIR}")
 # set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++0x -fpermissive")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14")
 
-add_executable(${project_name} main.cpp obj_mesh.cpp viewer.cpp ../common/shader.cpp)
+add_executable(${project_name} main.cpp obj_mesh.cpp viewer.cpp skybox.cpp ../common/shader.cpp)
 
 
 # include boiler plate

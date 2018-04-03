@@ -58,7 +58,7 @@
 #include <glm/gtc/type_ptr.hpp>
 
 #include "viewer.h"
-
+#include "skybox.h"
 
 using namespace CSI4130;
 using std::cerr;
@@ -105,7 +105,12 @@ struct ControlParameter {
 WindowSize g_winSize;
 ControlParameter g_control;
 Viewer* g_pViewer;
+Skybox* g_pSkybox;
 
+#define NUM_CUBE_MAPS 4
+std::string cubePaths[] = {"../hw_morning", "../ame_nebula", "../ame_shadow", "../darkskies"};
+std::string cubeFiles[] = {"morning", "purplenebula", "shadowpeak", "darkskies"};
+int cubeIndex = 0;
 
 void init(void)
 {
@@ -141,11 +146,17 @@ void display(void)
 #else
         glm::mat4 viewM(1.0);
 #endif
+        //cerr << "Draw skybox" << endl;
+        g_pSkybox->draw();
+        g_pSkybox->setViewMat(viewM );
         // set the view transform
+        //cerr << "Set View transform" << endl;
         g_pViewer->setViewMat( viewM );
         // set the model transform
+        //cerr << "Set Model transform" << endl;
         g_pViewer->setModelMat( g_control.d_rotMatrix );
         // actual draw command
+        //cerr << "Draw model" <<endl;
         g_pViewer->draw();
         // swap buffers
         glFlush();
@@ -272,6 +283,30 @@ void keyboard (unsigned char key, int x, int y)
                 break;
         case 'l':
                 // light off
+                break;
+        case 'w':
+                delete g_pViewer;
+                g_pViewer = new Viewer("box.obj");
+                g_pViewer->setProgMaterial();
+                init();
+                break;
+        case 'W':
+                delete g_pViewer;
+                g_pViewer = new Viewer("tiger.obj");
+                g_pViewer->setProgMaterial();
+                init();
+                break;
+        case 'r':
+                cubeIndex++;
+                cubeIndex %= NUM_CUBE_MAPS;
+                delete g_pSkybox;
+                g_pSkybox = new Skybox(cubePaths[cubeIndex], cubeFiles[cubeIndex]);
+                init();
+                break;
+        case 'R':
+                delete g_pSkybox;
+                g_pSkybox = new Skybox(std::string("../hw_morning"), std::string("morning"));
+                init();
                 break;
         case 'c':
                 // colors on
@@ -459,7 +494,7 @@ int main(int argc, char** argv) {
         errorOut();
   #endif
 
-        std::string fileName = "tiger.obj";
+        std::string fileName = "box.obj";
         glutInit(&argc, argv);
         glutInitDisplayMode (GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH);
         glutInitWindowSize (512, 512);
@@ -481,9 +516,13 @@ int main(int argc, char** argv) {
                 exit(-1);
         }
         if ( argc > 1 ) fileName = argv[1];
+        std::string skyboxPath = "../hw_morning";
+        std::string skyboxFileName = "morning";
         g_pViewer = new Viewer(fileName);
+        g_pViewer->setProgMaterial();
+        //g_pViewer->setProgColor();
+        g_pSkybox = new Skybox(skyboxPath, skyboxFileName);
         //g_pViewer->setProgTexture();
-        //g_pViewer->setProgMaterial();
         init();
         glutReshapeFunc(reshape);
         glutDisplayFunc(display);

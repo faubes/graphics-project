@@ -224,8 +224,8 @@ GLuint d_program;     // Currently active program
 GLuint d_progElement;     // Element array rendering
 GLuint d_progColor;     // direct rendering without elements and a color buffer
 GLuint d_progMaterial;     // program that uses materials
-GLuint d_progTexture;     // program that uses materials and textures
-GLuint d_progSkybox;
+GLuint d_progTexture;
+
 // Element rendering
 GLuint d_vao_ele;     // Vertex array object
 GLuint d_vbo_ele;     // Vertex buffer object
@@ -236,8 +236,7 @@ GLuint d_nIndices;
 // Rendering with vertex indices unrolled
 GLuint d_vao;     // Vertex array object
 GLuint d_vbo;     // Vertex buffer object
-GLuint d_skybox_vao; // VAO for skybox
-GLuint d_skybox_vbo;
+
 GLuint d_nbo;     // normal buffer object
 GLuint d_cbo;     // color buffer object
 GLuint d_mbo;     // material id buffer object
@@ -245,8 +244,6 @@ GLuint d_tbo;     // texture buffer object
 GLuint d_ubo;     // uniform buffer object for material
 GLuint d_nVert;
 
-// stores name of texture
-GLuint d_cubeMapTexture;
 
 // Transform to scale and translate the model to the cannonical viewing volume
 glm::mat4 d_unit;
@@ -263,51 +260,6 @@ std::vector<Texture> d_texInfo;
 bool d_withTexture;
 
 
-// https://learnopengl.com/code_viewer.php?code=advanced/cubemaps_skybox_data
-float skyboxVertices[3*36] = {
-    // positions
-    -1.0f,  1.0f, -1.0f,
-    -1.0f, -1.0f, -1.0f,
-     1.0f, -1.0f, -1.0f,
-     1.0f, -1.0f, -1.0f,
-     1.0f,  1.0f, -1.0f,
-    -1.0f,  1.0f, -1.0f,
-
-    -1.0f, -1.0f,  1.0f,
-    -1.0f, -1.0f, -1.0f,
-    -1.0f,  1.0f, -1.0f,
-    -1.0f,  1.0f, -1.0f,
-    -1.0f,  1.0f,  1.0f,
-    -1.0f, -1.0f,  1.0f,
-
-     1.0f, -1.0f, -1.0f,
-     1.0f, -1.0f,  1.0f,
-     1.0f,  1.0f,  1.0f,
-     1.0f,  1.0f,  1.0f,
-     1.0f,  1.0f, -1.0f,
-     1.0f, -1.0f, -1.0f,
-
-    -1.0f, -1.0f,  1.0f,
-    -1.0f,  1.0f,  1.0f,
-     1.0f,  1.0f,  1.0f,
-     1.0f,  1.0f,  1.0f,
-     1.0f, -1.0f,  1.0f,
-    -1.0f, -1.0f,  1.0f,
-
-    -1.0f,  1.0f, -1.0f,
-     1.0f,  1.0f, -1.0f,
-     1.0f,  1.0f,  1.0f,
-     1.0f,  1.0f,  1.0f,
-    -1.0f,  1.0f,  1.0f,
-    -1.0f,  1.0f, -1.0f,
-
-    -1.0f, -1.0f, -1.0f,
-    -1.0f, -1.0f,  1.0f,
-     1.0f, -1.0f, -1.0f,
-     1.0f, -1.0f, -1.0f,
-    -1.0f, -1.0f,  1.0f,
-     1.0f, -1.0f,  1.0f
-};
 
 
 public:
@@ -317,7 +269,6 @@ bool setProgElement();
 bool setProgColor();
 bool setProgMaterial();
 bool setProgTexture();
-bool setProgSkybox();
 
 inline void draw();
 
@@ -347,19 +298,11 @@ void generateBuffer( GLuint& _bo, int _sz, const void* _ptr=0 );
 
 
 void Viewer::draw() {
-    GLuint t = d_program;
-    glDepthMask(GL_FALSE);
-    switchProgram(d_progSkybox);
-    errorOut();
-    d_tfm.setUniforms();
-    errorOut();
-    glBindTexture(GL_TEXTURE_CUBE_MAP, d_cubeMapTexture);
-    glBindVertexArray(d_skybox_vao);
-    glDrawArrays(GL_TRIANGLES, 0, 36);
-    glDepthMask(GL_TRUE);
+        setArrayVAO();
+        glUseProgram(d_program);
 
-    switchProgram(t);
         d_tfm.setUniforms();
+        //cerr << "Set lights" << endl;
         setLightPosition(d_program,d_light.d_dist);
         if ( d_program == d_progElement ) {
 #ifdef DEBUG_VIEWER_VERBOSE

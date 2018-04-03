@@ -25,24 +25,24 @@
 // ==========================================================================
 #version 330 core
 
-in vec3 normalFrag; 
-in vec3 eyeFrag; 
-in vec3 lightFrag; 
+in vec3 normalFrag;
+in vec3 eyeFrag;
+in vec3 lightFrag;
 flat in int materialIndex;
 
 out vec4 color;
 
 struct LightSource {
-  vec4 ambient;  
+  vec4 ambient;
   vec4 diffuse;
   vec4 specular;
   // spot light
   // v is the vector to the vertex
-  // if dir*v < cos(cutoff) then (dir * v)^N 
+  // if dir*v < cos(cutoff) then (dir * v)^N
   vec3 spot_direction;
   float spot_exponent;
   float spot_cutoff;
-  // attentuation 1/(k_c + k_l r + k_q r^2) 
+  // attentuation 1/(k_c + k_l r + k_q r^2)
   // r is the distance of a vertex from the light source
   float constant_attenuation;
   float linear_attenuation;
@@ -57,11 +57,12 @@ struct Material {
   float shininess;
 };
 
+uniform samplerCube tex;
 
 uniform LightSource lights[1];
 
 layout (std140) uniform MaterialBlock {
-  uniform Material materials[5];	       
+  uniform Material materials[5];
 };
 
 
@@ -72,7 +73,7 @@ void main() {
 
   float distanceLight = length(lightFrag.xyz);
 
-  float attenuation = 1.0 / 
+  float attenuation = 1.0 /
     (lights[0].constant_attenuation +
      lights[0].linear_attenuation * distanceLight +
      lights[0].quadratic_attenuation * distanceLight * distanceLight);
@@ -86,7 +87,7 @@ void main() {
 
   vec3 HVec = normalize(LVec+EVec);
   float dotNH = max(0.0,dot(NVec,HVec));
-  vec4 specular = materials[materialIndex].specular * lights[0].specular 
+  vec4 specular = materials[materialIndex].specular * lights[0].specular
        * pow(dotNH,materials[materialIndex].shininess);
 
   // spot light
@@ -98,8 +99,10 @@ void main() {
     spot_attenuation = pow(dotSV,lights[0].spot_exponent);
   }
 
+  vec3 tc = reflect(eyeFrag, NVec);
+
   // color
-  color = ambient + 
-  	 attenuation * spot_attenuation * (diffuse + specular);
+  color = (ambient +
+  	 attenuation * spot_attenuation * (diffuse + specular)) * texture(tex, tc);
   // color = vec4(LVec,1.0);
 }

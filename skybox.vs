@@ -10,6 +10,6 @@ uniform mat4 ModelMatrix;
 
 void main()
 {
-    TexCoords = aPos;
+    TexCoords = -aPos;
     gl_Position = vec4(aPos, 1.0);
 }
