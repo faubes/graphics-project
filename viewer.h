@@ -298,6 +298,7 @@ void generateBuffer( GLuint& _bo, int _sz, const void* _ptr=0 );
 
 
 void Viewer::draw() {
+        glClear(GL_DEPTH_BUFFER_BIT);
         setArrayVAO();
         glUseProgram(d_program);
 

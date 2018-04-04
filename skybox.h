@@ -35,9 +35,9 @@ struct Skybox {
 
         void draw();
 // constructor
-        Skybox(const std::string & path, const std::string & fileName);
+        Skybox(const std::string & path, const std::string & fileName, const std::string & ext, int size);
 // cubemap loader
-        GLuint bindCubeMapTexture(const std::string &path, const std::string &fileName, bool _mipmap );
+        GLuint bindCubeMapTexture(const std::string &path, const std::string &fileName, const std::string &ext, int size );
 // copied from Viewer
         GLuint loadShader( std::string _basename );
 

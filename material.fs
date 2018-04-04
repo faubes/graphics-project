@@ -99,10 +99,10 @@ void main() {
     spot_attenuation = pow(dotSV,lights[0].spot_exponent);
   }
 
-  vec3 tc = reflect(eyeFrag, NVec);
+  vec3 tc = reflect(-eyeFrag, NVec);
 
   // color
   color = (ambient +
   	 attenuation * spot_attenuation * (diffuse + specular)) * texture(tex, tc);
-  // color = vec4(LVec,1.0);
+  //color = vec4((tc.x+1)/2, 0.0, 0.0, 1.0);
 }

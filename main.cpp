@@ -108,8 +108,10 @@ Viewer* g_pViewer;
 Skybox* g_pSkybox;
 
 #define NUM_CUBE_MAPS 4
-std::string cubePaths[] = {"../hw_morning", "../ame_nebula", "../ame_shadow", "../darkskies"};
-std::string cubeFiles[] = {"morning", "purplenebula", "shadowpeak", "darkskies"};
+std::string cubePaths[] = {"../yokohama3", "../storforsen4", "../lycksele", "../vasa"};
+std::string cubeFiles[] = {"yokohama", "storforsen4", "lycksele", "vasa"};
+std::string cubeTypes[] = {"jpg", "jpg", "jpg", "jpg"};
+int cubeSizes[] = {2048, 2048, 2048, 2048};
 int cubeIndex = 0;
 
 void init(void)
@@ -147,8 +149,8 @@ void display(void)
         glm::mat4 viewM(1.0);
 #endif
         //cerr << "Draw skybox" << endl;
-        g_pSkybox->draw();
         g_pSkybox->setViewMat(viewM );
+        g_pSkybox->draw();
         // set the view transform
         //cerr << "Set View transform" << endl;
         g_pViewer->setViewMat( viewM );
@@ -286,7 +288,7 @@ void keyboard (unsigned char key, int x, int y)
                 break;
         case 'w':
                 delete g_pViewer;
-                g_pViewer = new Viewer("box.obj");
+                g_pViewer = new Viewer("cube2.obj");
                 g_pViewer->setProgMaterial();
                 init();
                 break;
@@ -300,12 +302,18 @@ void keyboard (unsigned char key, int x, int y)
                 cubeIndex++;
                 cubeIndex %= NUM_CUBE_MAPS;
                 delete g_pSkybox;
-                g_pSkybox = new Skybox(cubePaths[cubeIndex], cubeFiles[cubeIndex]);
+                g_pSkybox = new Skybox(cubePaths[cubeIndex],
+                                       cubeFiles[cubeIndex],
+                                       cubeTypes[cubeIndex],
+                                       cubeSizes[cubeIndex]);
                 init();
                 break;
         case 'R':
                 delete g_pSkybox;
-                g_pSkybox = new Skybox(std::string("../hw_morning"), std::string("morning"));
+                g_pSkybox = new Skybox(cubePaths[0],
+                                       cubeFiles[0],
+                                       cubeTypes[0],
+                                       cubeSizes[0]);
                 init();
                 break;
         case 'c':
@@ -494,7 +502,7 @@ int main(int argc, char** argv) {
         errorOut();
   #endif
 
-        std::string fileName = "box.obj";
+        std::string fileName = "cube2.obj";
         glutInit(&argc, argv);
         glutInitDisplayMode (GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH);
         glutInitWindowSize (512, 512);
@@ -516,12 +524,14 @@ int main(int argc, char** argv) {
                 exit(-1);
         }
         if ( argc > 1 ) fileName = argv[1];
-        std::string skyboxPath = "../hw_morning";
-        std::string skyboxFileName = "morning";
+
         g_pViewer = new Viewer(fileName);
         g_pViewer->setProgMaterial();
         //g_pViewer->setProgColor();
-        g_pSkybox = new Skybox(skyboxPath, skyboxFileName);
+        g_pSkybox = new Skybox(cubePaths[0],
+                               cubeFiles[0],
+                               cubeTypes[0],
+                               cubeSizes[0]);
         //g_pViewer->setProgTexture();
         init();
         glutReshapeFunc(reshape);
